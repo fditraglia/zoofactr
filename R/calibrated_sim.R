@@ -1,5 +1,3 @@
-# Requires rmvtnorm package
-
 SURidentical <- function(Factors, Portfolios, inData, alpha = TRUE){
   Y <- as.matrix(inData[,c(Portfolios)])
   X <- as.matrix(inData[,c(Factors)])
@@ -10,10 +8,9 @@ SURidentical <- function(Factors, Portfolios, inData, alpha = TRUE){
   reg <- lm.fit(x = X, y = Y)
   FactorLoadings <- reg$coefficients
   FactorResiduals <- reg$residuals
-  return(list(Gamma = FactorLoadings, Sigma = cov(FactorResiduals)))
+  return(list(Gamma = FactorLoadings, Sigma = cov(FactorResiduals)))/home/fditraglia/ivdoctr/tests/testthat/test_helper_functions.R
 }
 
-# Calibrated simulation
 SURsim <- function(Factors, Portfolios, inData, alpha = TRUE,
                    FactorLoadings = NULL, nu = Inf){
   n_Obs <- nrow(inData)
