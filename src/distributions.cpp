@@ -2,18 +2,18 @@
 using namespace Rcpp;
 
 
+//' Simulate one draw from a multivariate normal distribution
+//'
+//' @param mu A numeric vector, the mean of the distribution.
+//' @param Sigma_inv A numeric matrix, the precision matrix (inverse of the
+//' of the variance-covariance matrix) of the distribution
+//' @return A column vector containing the draw.
+//' @details Uses the Cholesky decomposition of Sigma_inv.
+//' @examples
+//' M <- matrix(c(1, 0.5, 0.5, 1), 2, 2)
+//' draw_normal(c(0, 0), solve(M))
 // [[Rcpp::export]]
 arma::colvec draw_normal(arma::colvec mu, arma::mat Sigma_inv){
-/*-------------------------------------------------------
-# RETURNS:
-#  A draw from a MV Normal(mu, Sigma_inv) distribution
-#--------------------------------------------------------
-# ARGUMENTS:
-#  mu           mean vector
-#  Sigma_inv    precision matrix (inverse of cov matrix)
-#--------------------------------------------------------
-# NOTE: parameterized using precision matrix!
-#-------------------------------------------------------*/
   RNGScope scope;
   int p = Sigma_inv.n_cols;
   arma::colvec x = rnorm(p);
@@ -21,23 +21,26 @@ arma::colvec draw_normal(arma::colvec mu, arma::mat Sigma_inv){
   return mu + solve(trimatu(R), x);
 }
 
+//' Multivariate normal probability density function
+//'
+//' @param x A numeric matrix, each column of which is a point at which the
+//' density is to be evaluated.
+//' @param mu A numeric vector, the mean of the distribution.
+//' @param Sigma_inv A numeric matrix, the precision matrix (inverse of the
+//' of the variance-covariance matrix) of the distribution.
+//' @param logret, a logical value indicating whether to return the log density.
+//' @return A column vector whose jth element is the density of a multivariate
+//' normal distribution with mean mu and precision matrix Sigma_inv evaluated at
+//' the jth column of x. If logret is true, the natural logarithm of the density
+//' is returned.
+//' @examples
+//' M <- matrix(c(1, 0.5, 0.5, 1), 2, 2)
+//' m <- c(0, 0)
+//' density_normal(cbind(c(0, 0), c(2, 2)), m, solve(M))
+//' density_normal(cbind(c(0, 0), c(2, 2)), m, solve(M), TRUE)
 // [[Rcpp::export]]
 arma::vec density_normal(arma::mat x, arma::colvec mu, arma::mat Sigma_inv,
                          bool logret = false){
-/*-------------------------------------------------------
-# RETURNS:
-#  MV Normal(mu, Sigma_inv) probability density function
-#--------------------------------------------------------
-# ARGUMENTS:
-#  x            matrix of points at which density is
-#                 is to be evaluated: each column is a
-#                 point, each row is a coordinate
-#  mu           mean vector
-#  Sigma_inv    precision matrix (inverse of cov matrix)
-#  logret       if true, return log of density
-#--------------------------------------------------------
-# NOTE: Parameterized using precision matrix
-#-------------------------------------------------------*/
  int p = Sigma_inv.n_cols;
  arma::mat R = chol(Sigma_inv);
  double first = -0.5 * p * log(2.0 * arma::datum::pi);
@@ -51,21 +54,19 @@ arma::vec density_normal(arma::mat x, arma::colvec mu, arma::mat Sigma_inv,
    return exp(logdensity);
 }
 
+//' Simulate one draw from the Wishart distribution
+//'
+//' @param v An integer, the degrees of freedom of the distribution.
+//' @param S A numeric matrix, the scale matrix of the distribution.
+//' @return A column vector containing the draw.
+//' @details Employs the Bartlett Decomposition (Smith & Hocking 1972).
+//' Output exactly matches that of rwish from the MCMCpack package if the same
+//' random seed is used.
+//' @examples
+//' M <- matrix(c(1, 0.5, 0.5, 1), 2, 2)
+//' draw_wishart(10, M)
 // [[Rcpp::export]]
 arma::mat draw_wishart(int v, arma::mat S){
-/*-------------------------------------------------------
-# RETURNS:
-#  A draw from the Wishart(v, S) distribution.
-#--------------------------------------------------------
-# ARGUMENTS:
-#  v     degrees of freedom
-#  S     scale matrix
-#--------------------------------------------------------
-# NOTES:
-#  (1) Employs Bartlett Decomp. (Smith & Hocking, 1972)
-#  (2) Output is identical to rwish from MCMCpack R
-#      package provided the same seed is used.
-#-------------------------------------------------------*/
   RNGScope scope;
   int p = S.n_rows;
   arma::mat L = chol(S, "lower");
@@ -84,19 +85,14 @@ arma::mat draw_wishart(int v, arma::mat S){
 }
 
 
+//' Natural logarithm of the p-dimensional MV Gamma function
+//'
+//' @param p An integer, the dimesion of the MV Gamma function.
+//' @param a A real number, the argument of the MV Gamma function.
+//' @details Used to calculate the normalizing constant for the density of the
+//' Wishart distribution.
 // [[Rcpp::export]]
 double log_mv_gamma(int p, double a){
-/*-------------------------------------------------------
-# RETURNS:
-#  Natural logarithm of p-dimensional MV Gamma function
-#--------------------------------------------------------
-# ARGUMENTS:
-#  p     dimension of MV Gamma function
-#  a     argument of MV Gamma function
-#--------------------------------------------------------
-# NOTES: The multivariate Gamma function appears in the
-#        normalizing constant for the Wishart distribution
-#-------------------------------------------------------*/
   double lgamma_sum = 0.0;
   for(int j = 1; j <= p; j++){
     lgamma_sum += R::lgammafn(a + 0.5 * (1 - j));
@@ -105,18 +101,23 @@ double log_mv_gamma(int p, double a){
 }
 
 
+//' Wishart probability density function
+//'
+//' @param x A numeric matrix, the point at which the density is to be
+//' evaluated.
+//' @param v An integer, the degrees of freedom of the distribution.
+//' @param S A numeric matrix, the scale matrix of the distribution.
+//' of the variance-covariance matrix) of the distribution.
+//' @param logret, a logical value indicating whether to return the log density.
+//' @return A column real number: the value of the probability density function
+//' by the default or the natural logarithm if logret is TRUE.
+//' @examples
+//' M <- matrix(c(1, 0.5, 0.5, 1), 2, 2)
+//' density_wishart(M, 10, M)
+//' density_wishart(M, 10, M, TRUE)
 // [[Rcpp::export]]
 double density_wishart(arma::mat X, int v, arma::mat S,
                        bool logret = false){
-/*-------------------------------------------------------
-# RETURNS:
-#  Wishart(v, S) density evaluated at X
-#--------------------------------------------------------
-# ARGUMENTS:
-#  v        degrees of freedom
-#  S        scale matrix
-#  logret   if true, return log of density
-#-------------------------------------------------------*/
   int p = S.n_rows;
   double X_val, X_sign;
   log_det(X_val, X_sign, X);
