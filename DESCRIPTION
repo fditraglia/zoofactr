@@ -3,18 +3,18 @@ Type: Package
 Title: What the Package Does (Title Case)
 Version: 0.1
 Date: 2015-06-06
-Author: Who wrote it
+Author: Francis J. DiTraglia
 Maintainer: Who to complain to <fditra@sas.upenn.edu>
 Description: More about what it does (maybe more than one line)
 License: What license is it under?
 LazyData: TRUE
-Imports: 
+Imports:
     Rcpp (>= 0.11.6),
     mvtnorm
-LinkingTo: 
+LinkingTo:
     Rcpp,
     RcppArmadillo
-Suggests: 
+Suggests:
     testthat,
     MCMCpack,
     mvtnorm

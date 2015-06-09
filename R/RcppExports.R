@@ -21,16 +21,35 @@ density_wishart <- function(X, v, S, logret = FALSE) {
     .Call('zoofactr_density_wishart', PACKAGE = 'zoofactr', X, v, S, logret)
 }
 
-vech <- function(A) {
-    .Call('zoofactr_vech', PACKAGE = 'zoofactr', A)
+#' Half-vectorization of a symmetric matrix
+#'
+#' @param M An n by n symmetric matrix.
+#' @return A column vector containing the vech of M, i.e.
+#' the n * (n + 1) / 2 unique elements of M.
+#' @details Throws an error if M is not square, but does not test if M is
+#' symmetric. Elements above the main diagonal are simply ignored.
+#' @examples
+#' M <- matrix(c(11, 12, 13, 14,
+#'               12, 22, 23, 24,
+#'               13, 23, 33, 34,
+#'               14, 24, 34, 44), 4, 4, byrow = TRUE)
+#' vech(M)
+vech <- function(M) {
+    .Call('zoofactr_vech', PACKAGE = 'zoofactr', M)
 }
 
+#' Convert Half-vectorization to symmetric matrix
+#'
+#' @param v A numeric vector with n * (n + 1) / 2 elements.
+#' @param dim An integer indicating the dimension of the resulting square,
+#' symmetric matrix.
+#' @return The n by n symmetric matrix whose half-vectorization is v.
+#' @details Throws an error if dim does not correspond to the length of v.
+#' @examples
+#' v <- c(11:14, 22:24, 33:34, 44)
+#' devech(v, 4)
 devech <- function(v, dim) {
     .Call('zoofactr_devech', PACKAGE = 'zoofactr', v, dim)
-}
-
-rcpp_hello <- function() {
-    .Call('zoofactr_rcpp_hello', PACKAGE = 'zoofactr')
 }
 
 samplerTest <- function(X, Y, G0, g0, R0, r0, n_draws, burn_in) {

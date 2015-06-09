@@ -8,7 +8,7 @@ SURidentical <- function(Factors, Portfolios, inData, alpha = TRUE){
   reg <- lm.fit(x = X, y = Y)
   FactorLoadings <- reg$coefficients
   FactorResiduals <- reg$residuals
-  return(list(Gamma = FactorLoadings, Sigma = cov(FactorResiduals)))/home/fditraglia/ivdoctr/tests/testthat/test_helper_functions.R
+  return(list(Gamma = FactorLoadings, Sigma = cov(FactorResiduals)))
 }
 
 SURsim <- function(Factors, Portfolios, inData, alpha = TRUE,

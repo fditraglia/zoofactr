@@ -71,13 +71,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // vech
-arma::colvec vech(arma::mat A);
-RcppExport SEXP zoofactr_vech(SEXP ASEXP) {
+arma::colvec vech(arma::mat M);
+RcppExport SEXP zoofactr_vech(SEXP MSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
-    __result = Rcpp::wrap(vech(A));
+    Rcpp::traits::input_parameter< arma::mat >::type M(MSEXP);
+    __result = Rcpp::wrap(vech(M));
     return __result;
 END_RCPP
 }
@@ -90,16 +90,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::colvec >::type v(vSEXP);
     Rcpp::traits::input_parameter< int >::type dim(dimSEXP);
     __result = Rcpp::wrap(devech(v, dim));
-    return __result;
-END_RCPP
-}
-// rcpp_hello
-List rcpp_hello();
-RcppExport SEXP zoofactr_rcpp_hello() {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    __result = Rcpp::wrap(rcpp_hello());
     return __result;
 END_RCPP
 }
