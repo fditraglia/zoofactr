@@ -3,7 +3,7 @@
 # Source: Lubos Pastor's Website
 # (faculty.chicagobooth.edu/lubos.pastor/research/)
 #-----------------------------------------------------
-liq <- read.delim("http://faculty.chicagobooth.edu/lubos.pastor/research/liq_data_1962_2014.txt", comment.char = "%")
+liq <- read.delim("http://faculty.chicagobooth.edu/lubos.pastor/research/liq_data_1962_2014.txt", comment.char = "%", na.strings = "-99")
 names(liq) <- c("month", "LIQagg", "LIQinnov", "LIQv")
 devtools::use_data(liq)
 
