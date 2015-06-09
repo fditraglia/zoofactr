@@ -19,7 +19,8 @@ mom
 Monthly observations for the momentum factor.
 }
 \references{
-\url{http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/Data_Library/det_mom_factor.html}
+\url{http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/
+Data_Library/det_mom_factor.html}
 }
 \keyword{datasets}
 

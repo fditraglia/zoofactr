@@ -13,7 +13,8 @@
 #' Monthly observations for the momentum factor.
 #' @source \url{http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/
 #' data_library.html}
-#' @references \url{http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/Data_Library/det_mom_factor.html}
+#' @references \url{http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/
+#' Data_Library/det_mom_factor.html}
 "mom"
 
 #' Liquidity Factor
