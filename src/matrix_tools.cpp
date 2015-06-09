@@ -36,13 +36,3 @@ arma::mat devech(arma::colvec v, int dim){
   }
   return symmatl(out);
 }
-
-/*** R
-M <- matrix(c(11, 12, 13, 14,
-              12, 22, 23, 24,
-              13, 23, 33, 34,
-              14, 24, 34, 44), 4, 4, byrow = TRUE)
-v <- drop(vech(M))
-all.equal(v, c(11:14, 22:24, 33:34, 44))
-all.equal(devech(v, 4), M)
-*/

@@ -4,7 +4,7 @@ Title: What the Package Does (Title Case)
 Version: 0.1
 Date: 2015-06-06
 Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
+Maintainer: Who to complain to <fditra@sas.upenn.edu>
 Description: More about what it does (maybe more than one line)
 License: What license is it under?
 LazyData: TRUE
@@ -13,3 +13,7 @@ Imports:
 LinkingTo:
     Rcpp,
     RcppArmadillo
+Suggests:
+    testthat,
+    MCMCpack,
+    mvtnorm
