@@ -8,12 +8,13 @@ Maintainer: Who to complain to <fditra@sas.upenn.edu>
 Description: More about what it does (maybe more than one line)
 License: What license is it under?
 LazyData: TRUE
-Imports:
-    Rcpp (>= 0.11.6)
-LinkingTo:
+Imports: 
+    Rcpp (>= 0.11.6),
+    mvtnorm
+LinkingTo: 
     Rcpp,
     RcppArmadillo
-Suggests:
+Suggests: 
     testthat,
     MCMCpack,
     mvtnorm
