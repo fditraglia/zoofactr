@@ -73,6 +73,13 @@ industry10_value <- industry_raw[value_first:value_last]
 industry10_value <- read.table(textConnection(industry10_value), header = TRUE,
                                na.strings = c("-99.99", "-999"))
 
+industry10_value <- data.frame(month = rownames(industry10_value),
+                               industry10_value)
+rownames(industry10_value) <- NULL
+industry10_equal <- data.frame(month = rownames(industry10_equal),
+                               industry10_equal)
+rownames(industry10_equal) <- NULL
+
 
 industry10 <- list(equal = industry10_equal, value = industry10_value)
 rm(equal_first, equal_last, industry_raw, industry10_value, industry10_equal,
