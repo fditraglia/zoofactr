@@ -110,6 +110,30 @@ List samplerTest(arma::mat X, arma::mat Y, arma::mat G0, arma::vec g0,
   return out;
 }
 
+// [[Rcpp::export]]
+double logML_SUR(arma::mat X, arma::mat Y, arma::mat G0, arma::vec g0,
+                 arma::mat R0, int r0,
+                 int n_draws = 5000, int burn_in = 1000){
+  SURidentical draws(X, Y, G0, g0, R0, r0, n_draws, burn_in);
+  return draws.logML();
+}
+
+// [[Rcpp::export]]
+List defaultSUR(arma::mat X, arma::mat Y, double coef_scale = 10,
+              double cov_scale = 10){
+// If X ~ Wishart_d(v, S) then E[X] = v * S
+// and E[X^{-1}] = S^{-1} / (v - d - 1)
+  int d = Y.n_cols;
+  int p = X.n_cols * d;
+  arma::vec g0 = arma::zeros(p);
+  arma::mat G0 = pow(coef_scale, 2) * arma::eye(p, p);
+  int r0 = d + 2;
+  arma::mat R0 = arma::eye(d, d) / pow(cov_scale, 2);
+  SURidentical draws(X, Y, G0, g0, R0, r0, 5000, 1000);
+  List out = List::create(Named("g_draws") = draws.g_draws,
+          Named("Omega_inv_draws") = draws.Omega_inv_draws);
+  return out;
+}
 
 /*** R
 # setwd("~/factor-choice/")

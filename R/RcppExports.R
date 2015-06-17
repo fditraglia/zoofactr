@@ -114,3 +114,11 @@ samplerTest <- function(X, Y, G0, g0, R0, r0, n_draws, burn_in) {
     .Call('zoofactr_samplerTest', PACKAGE = 'zoofactr', X, Y, G0, g0, R0, r0, n_draws, burn_in)
 }
 
+logML_SUR <- function(X, Y, G0, g0, R0, r0, n_draws = 5000L, burn_in = 1000L) {
+    .Call('zoofactr_logML_SUR', PACKAGE = 'zoofactr', X, Y, G0, g0, R0, r0, n_draws, burn_in)
+}
+
+defaultSUR <- function(X, Y, coef_scale = 10, cov_scale = 10) {
+    .Call('zoofactr_defaultSUR', PACKAGE = 'zoofactr', X, Y, coef_scale, cov_scale)
+}
+
