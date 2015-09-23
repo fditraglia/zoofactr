@@ -123,3 +123,19 @@ qmj[, "QMJ"] <- as.numeric(qmj[, "QMJ"])
 rm(header_line, usa_ndx, non_empty_ndx, first_line, last_line, url, temp)
 devtools::use_data(qmj)
 rm(qmj)
+
+#-----------------------------------------------------
+# Profitability and Investment
+# Source: provided by Lu Zhang
+# (zhanglu@fisher.osu.ed)
+#-----------------------------------------------------
+file_dir <- "data/"
+file_name <- "HXZ q-Factors (monthly 1967 to 2014).csv"
+hxz <- read.csv(paste0(file_dir, file_name), header = TRUE)
+hxz$Month <- paste0(hxz$Year, sprintf("%02d", hxz$Month))
+hxz$Year <- NULL
+colnames(hxz)[1] <- "month"
+
+rm(file_dir, file_name)
+devtools::use_data(hxz)
+rm(hxz)
