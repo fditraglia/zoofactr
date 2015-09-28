@@ -139,3 +139,17 @@ colnames(hxz)[1] <- "month"
 rm(file_dir, file_name)
 devtools::use_data(hxz)
 rm(hxz)
+
+#-----------------------------------------------------
+# Common Idiosyncratic Volatility
+# Source: provided by Brian Kelly
+# (bryan.kelly@chicagobooth.edu)
+#-----------------------------------------------------
+file_dir <- "data/"
+file_name <- "CIV_time_series.csv"
+civ <- read.csv(paste0(file_dir, file_name), header = TRUE)
+colnames(civ)[1] <- "month"
+
+rm(file_dir, file_name)
+devtools::use_data(civ)
+rm(civ)
