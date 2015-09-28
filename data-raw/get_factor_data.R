@@ -24,7 +24,7 @@ first_line <- min(which(monthly_obs)) - 1
 last_line <- max(which(monthly_obs))
 mom <- mom[first_line:last_line]
 mom <- read.table(textConnection(mom), na.strings = c("-99.99", "-999"))
-mom <- data.frame(month = rownames(mom), mom)
+mom <- data.frame(month = rownames(mom), mom, stringsAsFactors = FALSE)
 rownames(mom) <- NULL
 names(mom)[2] <- "MOM"
 rm(monthly_obs, first_line, last_line, url_prefix, file_prefix, temp)
@@ -46,7 +46,7 @@ first_line <- min(which(monthly_obs)) - 1
 last_line <- max(which(monthly_obs))
 ff5 <- ff5[first_line:last_line]
 ff5 <- read.table(textConnection(ff5), na.strings = c("-99.99", "-999"))
-ff5 <- data.frame(month = rownames(ff5), ff5)
+ff5 <- data.frame(month = rownames(ff5), ff5, stringsAsFactors = FALSE)
 rownames(ff5) <- NULL
 rm(monthly_obs, first_line, last_line, url_prefix, file_prefix, temp)
 devtools::use_data(ff5)
@@ -63,15 +63,15 @@ bab <- read.xlsx(temp, 1, stringsAsFactors = FALSE)
 unlink(temp)
 header_line <- which(bab[ , 1] == 'DATE')
 usa_ndx <- which(bab[header_line, ] == "USA")
-non_empty_ndx <- which(!is.na(bab[ , usa_ndx]) & 
+non_empty_ndx <- which(!is.na(bab[ , usa_ndx]) &
                        bab[ , usa_ndx] != "")
 first_line <- min(non_empty_ndx[non_empty_ndx > header_line])
 last_line <- max(non_empty_ndx)
 bab <- data.frame(bab[first_line : last_line, c(1, usa_ndx)])
 colnames(bab) <- c("month", "BAB")
-bab[ , "month"] <- as.Date(as.numeric(bab[ , "month"]) - 25569, 
-                            origin = "1970-01-01") 
-bab[ , "month"] <- paste0(format(bab[ , "month"], "%Y"), 
+bab[ , "month"] <- as.Date(as.numeric(bab[ , "month"]) - 25569,
+                            origin = "1970-01-01")
+bab[ , "month"] <- paste0(format(bab[ , "month"], "%Y"),
                           format(bab[ , "month"], "%m"))
 bab[, "BAB"] <- as.numeric(bab[, "BAB"])
 
@@ -108,15 +108,15 @@ qmj <- read.xlsx(temp, 1, stringsAsFactors = FALSE)
 unlink(temp)
 header_line <- which(qmj[ , 1] == 'DATE')
 usa_ndx <- which(qmj[header_line, ] == "USA")
-non_empty_ndx <- which(!is.na(qmj[ , usa_ndx]) & 
+non_empty_ndx <- which(!is.na(qmj[ , usa_ndx]) &
                          qmj[ , usa_ndx] != "")
 first_line <- min(non_empty_ndx[non_empty_ndx > header_line])
 last_line <- max(non_empty_ndx)
 qmj <- data.frame(qmj[first_line : last_line, c(1, usa_ndx)])
 colnames(qmj) <- c("month", "QMJ")
-qmj[ , "month"] <- as.Date(as.numeric(qmj[ , "month"]) - 25569, 
-                           origin = "1970-01-01") 
-qmj[ , "month"] <- paste0(format(qmj[ , "month"], "%Y"), 
+qmj[ , "month"] <- as.Date(as.numeric(qmj[ , "month"]) - 25569,
+                           origin = "1970-01-01")
+qmj[ , "month"] <- paste0(format(qmj[ , "month"], "%Y"),
                           format(qmj[ , "month"], "%m"))
 qmj[, "QMJ"] <- as.numeric(qmj[, "QMJ"])
 
