@@ -21,8 +21,7 @@ test_that("cleanCRSPData produces correct results", {
                           marketValue = c(200 * 1, 300 * 2),
                           month = c(198603, 198602),
                           stringsAsFactors = FALSE)
-  rownames(expected) <- c(198603, 198602)
-  expect_equal(actual, expected)
+  expect_equal(actual, expected, check.attributes=FALSE)
 })
 
 test_that("computeExcessReturns", {

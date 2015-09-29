@@ -94,7 +94,6 @@ cleanCRSPData <- function(crspData) {
   crspData <- crspData[duplicateNdx, ]
   crspData$marketValue <- crspData$PRC * crspData$SHROUT
   crspData$month <- as.numeric(substr(as.character(crspData$date), 1, 6))
-  rownames(crspData) <- crspData$month
   return(crspData)
 }
 
