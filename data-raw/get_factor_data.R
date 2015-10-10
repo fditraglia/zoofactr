@@ -265,26 +265,12 @@ rm(npy, header, header_line, first_line, last_line)
 # Source: Dangling Jiang's website
 # https://sites.google.com/site/danlingjiang/data-library
 #-----------------------------------------------------
-key <- 'ZGVmYXVsdGRvbWFpbnxkYW5saW5namlhbmd8Z3g6NjU4ZTMzOGVmMDk4ZTE0Mw'
-key <- "https://docs.google.com/viewer?a=v&pid=sites&srcid=ZGVmYXVsdGRvbWFpbnxkYW5saW5namlhbmd8Z3g6NjU4ZTMzOGVmMDk4ZTE0Mw"
-temp <- tempfile()
-download.file(url, temp, mode = 'wb', method = "libcurl")
-umo <- read.xlsx(temp, 2, stringsAsFactors = FALSE)
-unlink(temp)npy <- read.xlsx(temp, 2, stringsAsFactors = FALSE)
-readGoogleDocs(gid = 2, key = key)
+file_dir <- "data/"
+file_name <- "UMO.xlsx"
+umo <- read.xlsx(paste0(file_dir, file_name), 2, stringsAsFactors = FALSE)
+umo$month <- umo$year * 100 + umo$month
+umo <- umo[, c("month", "UMO")]
 
-readGoogleDocs <- function(gid = NA, key = NA) {
-  # code from R bloggers
-  # http://www.r-bloggers.com/r-function-to-read-data-from-google-docs-spreadsheets/
-  if (is.na(gid)) {
-    stop('\nWorksheetnumber (gid) is missing\n')
-    }
-  if (is.na(key)) {
-    stop('\nDocumentkey (key) is missing\n')
-    }
-  require(RCurl)
-  url <- getURL(paste('https://docs.google.com/spreadsheet/pub?key=', key,
-                      '&single=true&gid=', gid, '&output=csv', sep = ''),
-                cainfo = system.file('CurlSSL', 'cacert.pem', package = 'RCurl'))
-  return(read.xlsx(textConnection(url), header = T, sep = ','))
-}
+rm(file_dir, file_name)
+devtools::use_data(umo)
+rm(umo)
