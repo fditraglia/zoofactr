@@ -262,6 +262,7 @@ rm(npy, header, header_line, first_line, last_line)
 #-----------------------------------------------------
 # Market Mispricing
 # UMO
+# Type: Returns
 # Source: Dangling Jiang's website
 # https://sites.google.com/site/danlingjiang/data-library
 #-----------------------------------------------------
@@ -274,3 +275,99 @@ umo <- umo[, c("month", "UMO")]
 rm(file_dir, file_name)
 devtools::use_data(umo)
 rm(umo)
+
+#-----------------------------------------------------
+# Market Sentiment
+# SENT: SENTorth (orthogonalized components) and SENT
+# Type: Macro
+# Description: Composite sentiment index based on various sentiment measures
+# Source: Jeffrey wurgler's website
+# http://people.stern.nyu.edu/jwurgler/
+#-----------------------------------------------------
+url <- "http://people.stern.nyu.edu/jwurgler/data/Investor_Sentiment_Data_v23_POST.xlsx"
+temp <- tempfile()
+download.file(url, temp, mode = 'wb')
+sent <- read.xlsx(temp, 2, stringsAsFactors = FALSE)
+unlink(temp)
+
+header_line <- which(sent[ , 1] == 'yearmo')
+header <- sent[header_line, ]
+notNA <- which(sent[ , 2] != '.')
+first_line <- min(notNA[notNA > header_line])
+last_line <- max(which(!is.na(sent[ , 1]) & sent[, 2] != ''))
+sent <- data.frame(sent[first_line : last_line, ])
+header <- c("month", "SENTorth", "SENT")
+colnames(sent) <- c("month", "SENTorth", "SENT")
+sent <- sent[ , header]
+sent$month <- as.numeric(sent$month)
+sent$SENTorth <- as.numeric(sent$SENTorth)
+sent$SENT <- as.numeric(sent$SENT)
+
+devtools::use_data(sent)
+rm(sent, header, header_line, first_line, last_line, notNA, temp, url)
+
+#-----------------------------------------------------
+# Private Information
+# PIN
+# Type: Returns
+# Description: Return on a zero-investment portfolio long in high PIN stocks
+# and short in low PIN stocks; PIN (private information) is the probability of information-
+# based trade
+# Source: Søren Hvidkjær's website
+# https://sites.google.com/site/hvidkjaer/data
+#-----------------------------------------------------
+pin <- read.delim("https://sites.google.com/site/hvidkjaer/data/data-files/pinret.txt?attredirects=0",
+                  comment.char = "%", na.strings = "-99", sep = " ")
+names(pin) <- c("month", "PIN")
+devtools::use_data(pin)
+rm(pin)
+
+#-----------------------------------------------------
+# Liquidity
+# LIQSadka: LIQfix and LIQvar
+# Type: Macro
+# Description: Market-wide liquidity constructed first by decomposing firm-level
+# liquidity into variable and fixed price effects then averaging the variable
+# component
+# Source: Ronnie Sadka's website
+# https://www2.bc.edu/ronnie-sadka/
+#-----------------------------------------------------
+url <- "http://www2.bc.edu/~sadka/Sadka-LIQ-factors-1983-2012-WRDS.xlsx"
+temp <- tempfile()
+download.file(url, temp, mode = 'wb')
+liqSadka <- read.xlsx(temp, 1, stringsAsFactors = FALSE)
+unlink(temp)
+
+liqSadka <- liqSadka[1:3, ]
+names(liqSadka) <- c("month", "LIQfix", "LIQvar")
+devtools::use_data(liqSadka)
+rm(liqSadka, header, header_line, first_line, last_line, notNA, temp, url)
+
+#-----------------------------------------------------
+# Consumption Volatility Risk
+# CVR
+# Type: Return
+# Description: Filtered consumption growth volatility from a Markov
+# regime-switching model based on historical consumption data
+# Source: Lars-Alexander Kuehn's website
+# http://berlin.tepper.cmu.edu/
+#-----------------------------------------------------
+url <- "http://berlin.tepper.cmu.edu/pdf/Data_Website.xlsx"
+temp <- tempfile()
+download.file(url, temp, mode = 'wb')
+cvr <- read.xlsx(temp, 3, stringsAsFactors = FALSE)
+unlink(temp)
+
+header_line <- which(cvr[ , 1] == 'Year')
+header <- cvr[header_line, ]
+first_line <- header_line + 1
+last_line <- max(which(!is.na(cvr[ , 1]) & cvr[, 1] != ''))
+cvr <- data.frame(cvr[first_line : last_line, ])
+colnames(cvr) <- header
+cvr$month <- as.numeric(cvr$Year) * 100 + as.numeric(cvr$Month)
+cvr <- cvr[, c("month", "CVR (H-L)")]
+colnames(cvr) <- c("month", "CVR")
+cvr$CVR <- as.numeric(cvr$CVR)
+
+devtools::use_data(cvr)
+rm(cvr, header, header_line, first_line, last_line, temp, url)
