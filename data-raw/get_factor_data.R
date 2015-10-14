@@ -262,6 +262,7 @@ rm(npy, header, header_line, first_line, last_line)
 #-----------------------------------------------------
 # Market Mispricing
 # UMO
+# Type: Returns
 # Source: Dangling Jiang's website
 # https://sites.google.com/site/danlingjiang/data-library
 #-----------------------------------------------------
@@ -274,3 +275,32 @@ umo <- umo[, c("month", "UMO")]
 rm(file_dir, file_name)
 devtools::use_data(umo)
 rm(umo)
+
+#-----------------------------------------------------
+# Market Sentiment
+# SENT: SENTorth and SENT
+# Type: Macro
+# Description: Composite sentiment index based on various sentiment measures
+# Source: Jeffrey wurgler's website
+# http://people.stern.nyu.edu/jwurgler/
+#-----------------------------------------------------
+url <- "http://people.stern.nyu.edu/jwurgler/data/Investor_Sentiment_Data_v23_POST.xlsx"
+temp <- tempfile()
+download.file(url, temp, mode = 'wb')
+sent <- read.xlsx(temp, 2, stringsAsFactors = FALSE)
+unlink(temp)
+
+header_line <- which(sent[ , 1] == 'yearmo')
+header <- sent[header_line, ]
+notNA <- which(sent[ , 2] != '.')
+first_line <- min(notNA[notNA > header_line])
+last_line <- max(which(!is.na(sent[ , 1]) & sent[, 2] != ''))
+sent <- data.frame(sent[first_line : last_line, ])
+header <- c("month", "SENTorth", "SENT")
+colnames(sent) <- c("month", "SENTorth", "SENT")
+sent <- sent[ , header]
+
+devtools::use_data(sent)
+rm(sent, header, header_line, first_line, last_line, notNA)
+
+
