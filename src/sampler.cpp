@@ -128,7 +128,7 @@ List defaultSUR(arma::mat X, arma::mat Y, double coef_scale = 10,
   arma::vec g0 = arma::zeros(p);
   arma::mat G0 = pow(coef_scale, 2) * arma::eye(p, p);
   int r0 = d + 2;
-  arma::mat R0 = arma::eye(d, d) / pow(cov_scale, 2);
+  arma::mat R0 = arma::eye(d, d) / (pow(cov_scale, 2) * r0);
   SURidentical draws(X, Y, G0, g0, R0, r0, 5000, 1000);
   List out = List::create(Named("g_draws") = draws.g_draws,
           Named("Omega_inv_draws") = draws.Omega_inv_draws);
