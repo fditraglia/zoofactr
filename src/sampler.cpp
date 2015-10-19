@@ -73,7 +73,7 @@ double SURidentical::logML(){
   arma::mat Omega_inv_star = devech(mean(Omega_inv_draws, 1), D);
 
   double prior1 = as_scalar(density_normal(gstar, g0copy,
-                                           G0copy, true));
+                                           inv_sympd(G0copy), true));
   double prior2 = density_wishart(Omega_inv_star, r0copy,
                                   R0copy, true);
 
