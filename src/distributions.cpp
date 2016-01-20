@@ -1,4 +1,5 @@
 #include <RcppArmadillo.h>
+#include <math.h>
 using namespace Rcpp;
 
 
@@ -29,6 +30,7 @@ arma::colvec draw_normal(arma::colvec mu, arma::mat Sigma_inv){
 //' @param Sigma_inv A numeric matrix, the precision matrix (inverse of the
 //' of the variance-covariance matrix) of the distribution.
 //' @param logret, a logical value indicating whether to return the log density.
+//' Defaults to FALSE.
 //' @return A column vector whose jth element is the density of a multivariate
 //' normal distribution with mean mu and precision matrix Sigma_inv evaluated at
 //' the jth column of x. If logret is true, the natural logarithm of the density
@@ -109,6 +111,7 @@ double log_mv_gamma(int p, double a){
 //' @param S A numeric matrix, the scale matrix of the distribution.
 //' of the variance-covariance matrix) of the distribution.
 //' @param logret, a logical value indicating whether to return the log density.
+//' Defaults to FALSE.
 //' @return A column real number: the value of the probability density function
 //' by the default or the natural logarithm if logret is TRUE.
 //' @examples
@@ -134,3 +137,60 @@ double density_wishart(arma::mat X, int v, arma::mat S,
   else
     return exp(logdensity);
 }
+
+//' Armadillo wrapper for R's log1p function.
+//'
+//' @param x A numeric vector.
+//' @return A numeric vector whose values are log(1 + x).
+//' @details This is simply a wrapper to the vectorized Rcpp sugar function
+//' log1p which uses the same implementation as R. It takes an Armadillo vector
+//' as input and returns and Armadillo vector as output. It is intended for use
+//' in C++ code that uses only Armadillo types.
+//' @examples
+//' log1p_arma(1/10^(0:5))
+// [[Rcpp::export]]
+arma::vec log1p_arma(arma::vec x){
+  NumericVector x_Rcpp = NumericVector(x.begin(), x.end());
+  NumericVector out_Rcpp = Rcpp::log1p(x_Rcpp);
+  arma::vec out(out_Rcpp.begin(), out_Rcpp.size(), false);
+  return(out);
+}
+
+
+//' Multivariate Student-t probability density function
+//'
+//' @param nu A positive integer, the degrees of freedom of the distribution.
+//' @param x A numeric matrix, each column of which is a point at which the
+//' density is to be evaluated.
+//' @param mu A numeric vector, the location parameter of the distribution.
+//' @param Sigma_inv A numeric matrix, the inverse of the scale matrix the
+//' of the variance-covariance matrix) of the distribution.
+//' @param logret, a logical value indicating whether to return the log density.
+//' Defaults to FALSE.
+//' @return A column vector whose jth element is the density of a multivariate
+//' Student-t with the specified parameters evaluated at  the jth column of x.
+//' If logret is true, the natural logarithm of the density is returned.
+//' @examples
+//' M <- matrix(c(1, 0.5, 0.5, 1), 2, 2)
+//' m <- c(0, 0)
+//' df <- 20
+//' density_t(cbind(c(0, 0), c(2, 2)), df, m, solve(M))
+//' density_t(cbind(c(0, 0), c(2, 2)), df, m, solve(M), TRUE)
+// [[Rcpp::export]]
+arma::vec density_t(arma::mat x, int nu, arma::colvec mu, arma::mat Sigma_inv,
+                         bool logret = false){
+ int p = Sigma_inv.n_cols;
+ arma::mat R = chol(Sigma_inv);
+ double t1 = R::lgammafn(0.5 * (nu + p));
+ double t2 = -1.0 * R::lgammafn(0.5 * nu);
+ double t3 = -0.5 * p * log(nu * arma::datum::pi);
+ double t4 = sum(log(diagvec(R)));
+ x.each_col() -= mu;
+ arma::vec t5 = -0.5 * (nu + p) * log1p_arma(sum(pow(R * x, 2)).t() / nu);
+ arma::vec logdensity = t1 + t2 + t3 + t4 + t5;
+ if(logret)
+   return logdensity;
+ else
+   return exp(logdensity);
+}
+
