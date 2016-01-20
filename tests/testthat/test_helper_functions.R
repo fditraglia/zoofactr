@@ -63,3 +63,14 @@ test_that("density_t matches dmvt from package mvtnorm", {
   lf_mvtnorm <- mvtnorm::dmvt(t(x0), delta = m, sigma = M, df = df, log = TRUE)
   expect_equal(drop(f_mine), f_mvtnorm)
 })
+
+test_that("draw_gamma matches rgamma from base R", {
+  n <- 50
+  a <- 2
+  rates <- 1:50/5
+  set.seed(1234)
+  draws_R <- rgamma(n, a, rate = rates)
+  set.seed(1234)
+  draws_mine <- draw_gamma(a, rates)
+  expect_equal(drop(draws_mine), draws_R)
+})

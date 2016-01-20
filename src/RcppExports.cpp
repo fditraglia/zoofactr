@@ -96,6 +96,18 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// draw_gamma
+arma::vec draw_gamma(double a, arma::vec rate);
+RcppExport SEXP zoofactr_draw_gamma(SEXP aSEXP, SEXP rateSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< double >::type a(aSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type rate(rateSEXP);
+    __result = Rcpp::wrap(draw_gamma(a, rate));
+    return __result;
+END_RCPP
+}
 // vech
 arma::colvec vech(arma::mat M);
 RcppExport SEXP zoofactr_vech(SEXP MSEXP) {

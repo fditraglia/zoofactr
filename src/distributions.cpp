@@ -1,5 +1,4 @@
 #include <RcppArmadillo.h>
-#include <math.h>
 using namespace Rcpp;
 
 
@@ -153,7 +152,7 @@ arma::vec log1p_arma(arma::vec x){
   NumericVector x_Rcpp = NumericVector(x.begin(), x.end());
   NumericVector out_Rcpp = Rcpp::log1p(x_Rcpp);
   arma::vec out(out_Rcpp.begin(), out_Rcpp.size(), false);
-  return(out);
+  return out;
 }
 
 
@@ -194,3 +193,32 @@ arma::vec density_t(arma::mat x, int nu, arma::colvec mu, arma::mat Sigma_inv,
    return exp(logdensity);
 }
 
+
+//' Simulate draws from the Gamma distribution.
+//'
+//' @param a A positive number, the shape parameter of the distribution.
+//' @param rate A numeric vector of positive values containing the rates
+//' rates parameters for each draw.
+//' @return A vector of random draws. The jth element is a Gamma(a, rate(j))
+//' variate.
+//' @details Note that the rate parameter is the reciprocal of the scale
+//' parameter which appears as an argument in the underlying C function rgamma
+//' from Rmath.h called here. The function draw_gamma is vectorized for its
+//' second argument, the vector of rate parameters, and uses the length of this
+//' parameter to determine how many draws to make. This function is intended
+//' for use in a Gibbs sampler that uses the scale mixture of normals
+//' representation of the Student-t distribution. In each step of the sampler
+//' we draw an auxiliary parameter (a Gamma variate) for each observation in the
+//' sample. Each of these draws has the same shape parameter but a different
+//' rate parameter.
+//' @examples
+//' draw_gamma(1, 1:10)
+// [[Rcpp::export]]
+arma::vec draw_gamma(double a, arma::vec rate){
+  RNGScope scope;
+  int n = rate.n_rows;
+  arma::vec out(n);
+  for(int i = 0; i < n; i++)
+     out(i) = R::rgamma(a, 1 / rate(i)); //zero-indexing
+  return out;
+}

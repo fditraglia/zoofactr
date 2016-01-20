@@ -118,6 +118,29 @@ density_t <- function(x, nu, mu, Sigma_inv, logret = FALSE) {
     .Call('zoofactr_density_t', PACKAGE = 'zoofactr', x, nu, mu, Sigma_inv, logret)
 }
 
+#' Simulate draws from the Gamma distribution.
+#'
+#' @param a A positive number, the shape parameter of the distribution.
+#' @param rate A numeric vector of positive values containing the rates
+#' rates parameters for each draw.
+#' @return A vector of random draws. The jth element is a Gamma(a, rate(j))
+#' variate.
+#' @details Note that the rate parameter is the reciprocal of the scale
+#' parameter which appears as an argument in the underlying C function rgamma
+#' from Rmath.h called here. The function draw_gamma is vectorized for its
+#' second argument, the vector of rate parameters, and uses the length of this
+#' parameter to determine how many draws to make. This function is intended
+#' for use in a Gibbs sampler that uses the scale mixture of normals
+#' representation of the Student-t distribution. In each step of the sampler
+#' we draw an auxiliary parameter (a Gamma variate) for each observation in the
+#' sample. Each of these draws has the same shape parameter but a different
+#' rate parameter.
+#' @examples
+#' draw_gamma(1, 1:10)
+draw_gamma <- function(a, rate) {
+    .Call('zoofactr_draw_gamma', PACKAGE = 'zoofactr', a, rate)
+}
+
 #' Half-vectorization of a symmetric matrix
 #'
 #' @param M An n by n symmetric matrix.
