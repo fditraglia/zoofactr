@@ -23,6 +23,7 @@ draw_normal <- function(mu, Sigma_inv) {
 #' @param Sigma_inv A numeric matrix, the precision matrix (inverse of the
 #' of the variance-covariance matrix) of the distribution.
 #' @param logret, a logical value indicating whether to return the log density.
+#' Defaults to FALSE.
 #' @return A column vector whose jth element is the density of a multivariate
 #' normal distribution with mean mu and precision matrix Sigma_inv evaluated at
 #' the jth column of x. If logret is true, the natural logarithm of the density
@@ -69,6 +70,7 @@ log_mv_gamma <- function(p, a) {
 #' @param S A numeric matrix, the scale matrix of the distribution.
 #' of the variance-covariance matrix) of the distribution.
 #' @param logret, a logical value indicating whether to return the log density.
+#' Defaults to FALSE.
 #' @return A column real number: the value of the probability density function
 #' by the default or the natural logarithm if logret is TRUE.
 #' @examples
@@ -77,6 +79,43 @@ log_mv_gamma <- function(p, a) {
 #' density_wishart(M, 10, M, TRUE)
 density_wishart <- function(X, v, S, logret = FALSE) {
     .Call('zoofactr_density_wishart', PACKAGE = 'zoofactr', X, v, S, logret)
+}
+
+#' Armadillo wrapper for R's log1p function.
+#'
+#' @param x A numeric vector.
+#' @return A numeric vector whose values are log(1 + x).
+#' @details This is simply a wrapper to the vectorized Rcpp sugar function
+#' log1p which uses the same implementation as R. It takes an Armadillo vector
+#' as input and returns and Armadillo vector as output. It is intended for use
+#' in C++ code that uses only Armadillo types.
+#' @examples
+#' log1p_arma(1/10^(0:5))
+log1p_arma <- function(x) {
+    .Call('zoofactr_log1p_arma', PACKAGE = 'zoofactr', x)
+}
+
+#' Multivariate Student-t probability density function
+#'
+#' @param nu A positive integer, the degrees of freedom of the distribution.
+#' @param x A numeric matrix, each column of which is a point at which the
+#' density is to be evaluated.
+#' @param mu A numeric vector, the location parameter of the distribution.
+#' @param Sigma_inv A numeric matrix, the inverse of the scale matrix the
+#' of the variance-covariance matrix) of the distribution.
+#' @param logret, a logical value indicating whether to return the log density.
+#' Defaults to FALSE.
+#' @return A column vector whose jth element is the density of a multivariate
+#' Student-t with the specified parameters evaluated at  the jth column of x.
+#' If logret is true, the natural logarithm of the density is returned.
+#' @examples
+#' M <- matrix(c(1, 0.5, 0.5, 1), 2, 2)
+#' m <- c(0, 0)
+#' df <- 20
+#' density_t(cbind(c(0, 0), c(2, 2)), df, m, solve(M))
+#' density_t(cbind(c(0, 0), c(2, 2)), df, m, solve(M), TRUE)
+density_t <- function(x, nu, mu, Sigma_inv, logret = FALSE) {
+    .Call('zoofactr_density_t', PACKAGE = 'zoofactr', x, nu, mu, Sigma_inv, logret)
 }
 
 #' Half-vectorization of a symmetric matrix

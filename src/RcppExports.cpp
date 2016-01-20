@@ -70,6 +70,32 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// log1p_arma
+arma::vec log1p_arma(arma::vec x);
+RcppExport SEXP zoofactr_log1p_arma(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
+    __result = Rcpp::wrap(log1p_arma(x));
+    return __result;
+END_RCPP
+}
+// density_t
+arma::vec density_t(arma::mat x, int nu, arma::colvec mu, arma::mat Sigma_inv, bool logret);
+RcppExport SEXP zoofactr_density_t(SEXP xSEXP, SEXP nuSEXP, SEXP muSEXP, SEXP Sigma_invSEXP, SEXP logretSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< arma::mat >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type nu(nuSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Sigma_inv(Sigma_invSEXP);
+    Rcpp::traits::input_parameter< bool >::type logret(logretSEXP);
+    __result = Rcpp::wrap(density_t(x, nu, mu, Sigma_inv, logret));
+    return __result;
+END_RCPP
+}
 // vech
 arma::colvec vech(arma::mat M);
 RcppExport SEXP zoofactr_vech(SEXP MSEXP) {

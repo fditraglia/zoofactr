@@ -11,10 +11,10 @@ LazyData: TRUE
 Imports:
     Rcpp (>= 0.11.6),
     mvtnorm
-LinkingTo:
-    Rcpp,
+LinkingTo: Rcpp,
     RcppArmadillo
 Suggests:
     testthat,
     MCMCpack,
     mvtnorm
+RoxygenNote: 5.0.1
