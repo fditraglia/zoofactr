@@ -42,5 +42,24 @@ test_that("density_wishart matches dwish from MCMCpack", {
   f_MCMCpack <- MCMCpack::dwish(3 * M_inv, 5, M_inv)
   expect_equal(f_mine, f_MCMCpack)
   logf_mine <- density_wishart(3 * M_inv, 5, M_inv, logret = TRUE)
-  all.equal(logf_mine, log(f_MCMCpack))
+  expect_equal(logf_mine, log(f_MCMCpack))
+})
+
+test_that("log1p_arma matches log1p from base R", {
+  x <- 10^(0:20)
+  expect_equal(drop(log1p_arma(x)), log1p(x))
+})
+
+test_that("density_t matches dmvt from package mvtnorm", {
+  M <- matrix(c(1, 0.5, 0.5, 1), 2, 2)
+  M_inv <- solve(M)
+  m <- c(-0.5, 0.5)
+  df <- 10
+  x0 <- as.matrix(c(-0.123456789, 0.987654321))
+  f_mine <- density_t(x0, nu = df, mu = m, Sigma_inv = M_inv, logret = FALSE)
+  f_mvtnorm <- mvtnorm::dmvt(t(x0), delta = m, sigma = M, df = df, log = FALSE)
+  expect_equal(drop(f_mine), f_mvtnorm)
+  lf_mine <- density_t(x0, nu = df, mu = m, Sigma_inv = M_inv, logret = TRUE)
+  lf_mvtnorm <- mvtnorm::dmvt(t(x0), delta = m, sigma = M, df = df, log = TRUE)
+  expect_equal(drop(f_mine), f_mvtnorm)
 })
