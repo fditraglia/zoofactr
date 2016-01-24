@@ -87,9 +87,9 @@ double SURnormal::logML(){
   double post1 = as_scalar(density_normal(gstar, gbar_star,
                                           GT_inv_star, true));
 
-  arma::vec post2_terms(RT.n_cols);
+  arma::vec post2_terms(RT_draws.n_cols);
   arma::mat RT_g(D, D);
-  for(int i = 0; i < RT.n_cols; i++){
+  for(int i = 0; i < RT_draws.n_cols; i++){
     RT_g = devech(RT_draws.col(i), D);
     post2_terms(i) = density_wishart(Omega_inv_star, r1, RT_g);
   }
