@@ -4,9 +4,9 @@
 
 using namespace Rcpp;
 
-class SURidentical {
+class SURnormal {
   public:
-    SURidentical(const arma::mat&, const arma::mat&, const arma::mat&,
+    SURnormal(const arma::mat&, const arma::mat&, const arma::mat&,
                  const arma::vec&, const arma::mat&, int, int, int);
     double logML();
     arma::mat g_draws, Omega_inv_draws;
@@ -18,7 +18,7 @@ class SURidentical {
     arma::mat resid, RT, GT_inv, Omega_inv, RT_draws;
 };
 //Class constructor
-SURidentical::SURidentical(const arma::mat& X, const arma::mat& Y,
+SURnormal::SURnormal(const arma::mat& X, const arma::mat& Y,
                            const arma::mat& G0, const arma::vec& g0,
                            const arma::mat& R0, int r0,
                            int n_draws = 1000,
@@ -68,7 +68,7 @@ SURidentical::SURidentical(const arma::mat& X, const arma::mat& Y,
   }
 }
 //Member function to calculate marginal likelihood
-double SURidentical::logML(){
+double SURnormal::logML(){
   arma::vec gstar = mean(g_draws, 1);
   arma::mat Omega_inv_star = devech(mean(Omega_inv_draws, 1), D);
 
@@ -100,10 +100,10 @@ double SURidentical::logML(){
 
 
 // [[Rcpp::export]]
-List samplerTest(arma::mat X, arma::mat Y, arma::mat G0, arma::vec g0,
+List samplerTest_normal(arma::mat X, arma::mat Y, arma::mat G0, arma::vec g0,
                  arma::mat R0, int r0,
                  int n_draws, int burn_in){
-  SURidentical draws(X, Y, G0, g0, R0, r0, n_draws, burn_in);
+  SURnormal draws(X, Y, G0, g0, R0, r0, n_draws, burn_in);
   List out = List::create(Named("g_draws") = draws.g_draws,
           Named("Omega_inv_draws") = draws.Omega_inv_draws,
           Named("logML") = draws.logML());
@@ -111,15 +111,15 @@ List samplerTest(arma::mat X, arma::mat Y, arma::mat G0, arma::vec g0,
 }
 
 // [[Rcpp::export]]
-double logML_SUR(arma::mat X, arma::mat Y, arma::mat G0, arma::vec g0,
+double logML_SUR_normal(arma::mat X, arma::mat Y, arma::mat G0, arma::vec g0,
                  arma::mat R0, int r0,
                  int n_draws = 5000, int burn_in = 1000){
-  SURidentical draws(X, Y, G0, g0, R0, r0, n_draws, burn_in);
+  SURnormal draws(X, Y, G0, g0, R0, r0, n_draws, burn_in);
   return draws.logML();
 }
 
 // [[Rcpp::export]]
-List defaultSUR(arma::mat X, arma::mat Y, double coef_scale = 10,
+List defaultSUR_normal(arma::mat X, arma::mat Y, double coef_scale = 10,
               double cov_scale = 10){
 // If X ~ Wishart_d(v, S) then E[X] = v * S
 // and E[X^{-1}] = S^{-1} / (v - d - 1)
@@ -129,33 +129,8 @@ List defaultSUR(arma::mat X, arma::mat Y, double coef_scale = 10,
   arma::mat G0 = pow(coef_scale, 2) * arma::eye(p, p);
   int r0 = d + 2;
   arma::mat R0 = arma::eye(d, d) / (pow(cov_scale, 2) * r0);
-  SURidentical draws(X, Y, G0, g0, R0, r0, 5000, 1000);
+  SURnormal draws(X, Y, G0, g0, R0, r0, 5000, 1000);
   List out = List::create(Named("g_draws") = draws.g_draws,
           Named("Omega_inv_draws") = draws.Omega_inv_draws);
   return out;
 }
-
-/*** R
-# setwd("~/factor-choice/")
-# dat <- read.csv("data_value.csv")
-# nT <- nrow(dat)
-# x1 <- rep(1, nT)
-# x2 <- dat$Mkt.RF
-# x3 <- dat$SMB
-# x4 <- dat$HML
-# M <- matrix(c(1, 0.2, 0.2, 1), 2, 2)
-# set.seed(1234)
-# errors <- t(chol(M) %*% rbind(rnorm(nT), rnorm(nT)))
-# y1 <- x2 + errors[,1]
-# y2 <- 0.5 + x2 + 0.2 * x3 + 0.2 * x4 + errors[,2]
-# Y <- cbind(y1, y2)
-# X <- cbind(x1, x2, x3, x4)
-# rm(x1, x2, x3, x4, y1, y2, nT, dat)
-# r0 <- 10
-# g0 <- rep(0, ncol(X) * ncol(Y))
-# G0 <- diag(ncol(X) * ncol(Y))
-# R0 <- diag(ncol(Y))
-# gibbs <- samplerTest(X, Y, G0, g0, R0, r0, 4000, 1000)
-# solve(devech(rowMeans(gibbs$Omega_inv_draws), 2))
-# matrix(rowMeans(gibbs$g_draws), ncol(X), ncol(Y))
-*/
