@@ -11,18 +11,22 @@ class SURnormal {
     double logML();
     arma::mat g_draws, Omega_inv_draws;
 //  private:
-    int r1, T, D, K, p, n_vech, j, r0copy;
-    arma::vec G0_inv_g0, gbar, g, g0copy;
+    int r1, T, D, K, p, n_vech, j;
+    arma::vec G0_inv_g0, gbar, g;
     arma::mat XX, XY, R0_inv, G0_inv;
-    arma::mat Xcopy, Ycopy, G0copy, R0copy;
     arma::mat resid, RT, GT_inv, Omega_inv, RT_draws;
+    //Private copies of prior and other input parameters with same names
+    //as the corresponding function arguments using an initialization list
+    const int r0, n_draws, burn_in;
+    const arma::mat X, Y, G0, R0;
+    const arma::vec g0;
 };
 //Class constructor
 SURnormal::SURnormal(const arma::mat& X, const arma::mat& Y,
-                           const arma::mat& G0, const arma::vec& g0,
-                           const arma::mat& R0, int r0,
-                           int n_draws = 1000,
-                           int burn_in = 1000){
+                     const arma::mat& G0, const arma::vec& g0,
+                     const arma::mat& R0, int r0, int n_draws = 1000,
+                     int burn_in = 1000): r0(r0), n_draws(n_draws),
+                     burn_in(burn_in), X(X), Y(Y), G0(G0), R0(R0), g0(g0){
   T = Y.n_rows;
   D = Y.n_cols;
   K = X.n_cols;
@@ -32,13 +36,6 @@ SURnormal::SURnormal(const arma::mat& X, const arma::mat& Y,
   Omega_inv_draws.zeros(n_vech, n_draws);
   g_draws.zeros(p, n_draws);
   RT_draws.zeros(n_vech, n_draws);
-
-  r0copy = r0;
-  G0copy = G0;
-  g0copy = g0;
-  R0copy = R0;
-  Xcopy = X;
-  Ycopy = Y;
 
   XX = X.t() * X;
   XY = X.t() * Y;
@@ -71,10 +68,10 @@ double SURnormal::logML(){
   arma::vec gstar = mean(g_draws, 1);
   arma::mat Omega_inv_star = devech(mean(Omega_inv_draws, 1), D);
 
-  double prior1 = as_scalar(density_normal(gstar, g0copy, G0_inv, true));
-  double prior2 = density_wishart(Omega_inv_star, r0copy, R0copy, true);
+  double prior1 = as_scalar(density_normal(gstar, g0, G0_inv, true));
+  double prior2 = density_wishart(Omega_inv_star, r0, R0, true);
 
-  arma::mat resid_star =  Ycopy - Xcopy * reshape(gstar, K, D);
+  arma::mat resid_star =  Y - X * reshape(gstar, K, D);
   double like = sum(density_normal(resid_star.t(), arma::zeros<arma::vec>(D),
                                    Omega_inv_star, true));
 
@@ -85,10 +82,9 @@ double SURnormal::logML(){
                                           GT_inv_star, true));
 
   arma::vec post2_terms(RT_draws.n_cols);
-  arma::mat RT_g(D, D);
-  for(int i = 0; i < RT_draws.n_cols; i++){
-    RT_g = devech(RT_draws.col(i), D);
-    post2_terms(i) = density_wishart(Omega_inv_star, r1, RT_g);
+  for(int i = 0; i < n_draws; i++){
+    post2_terms(i) = density_wishart(Omega_inv_star, r1,
+                devech(RT_draws.col(i), D));
   }
   double post2 = log(mean(post2_terms));
 
