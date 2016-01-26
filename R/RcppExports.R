@@ -172,15 +172,27 @@ devech <- function(v, dim) {
     .Call('zoofactr_devech', PACKAGE = 'zoofactr', v, dim)
 }
 
-samplerTest <- function(X, Y, G0, g0, R0, r0, n_draws, burn_in) {
-    .Call('zoofactr_samplerTest', PACKAGE = 'zoofactr', X, Y, G0, g0, R0, r0, n_draws, burn_in)
+samplerTest_normal <- function(X, Y, G0, g0, R0, r0, n_draws, burn_in) {
+    .Call('zoofactr_samplerTest_normal', PACKAGE = 'zoofactr', X, Y, G0, g0, R0, r0, n_draws, burn_in)
 }
 
-logML_SUR <- function(X, Y, G0, g0, R0, r0, n_draws = 5000L, burn_in = 1000L) {
-    .Call('zoofactr_logML_SUR', PACKAGE = 'zoofactr', X, Y, G0, g0, R0, r0, n_draws, burn_in)
+logML_SUR_normal <- function(X, Y, G0, g0, R0, r0, n_draws = 5000L, burn_in = 1000L) {
+    .Call('zoofactr_logML_SUR_normal', PACKAGE = 'zoofactr', X, Y, G0, g0, R0, r0, n_draws, burn_in)
 }
 
-defaultSUR <- function(X, Y, coef_scale = 10, cov_scale = 10) {
-    .Call('zoofactr_defaultSUR', PACKAGE = 'zoofactr', X, Y, coef_scale, cov_scale)
+defaultSUR_normal <- function(X, Y, coef_scale = 10, cov_scale = 10) {
+    .Call('zoofactr_defaultSUR_normal', PACKAGE = 'zoofactr', X, Y, coef_scale, cov_scale)
+}
+
+samplerTest_t <- function(X, Y, G0, g0, R0, r0, nu, n_draws, burn_in) {
+    .Call('zoofactr_samplerTest_t', PACKAGE = 'zoofactr', X, Y, G0, g0, R0, r0, nu, n_draws, burn_in)
+}
+
+logML_SUR_t <- function(X, Y, G0, g0, R0, r0, nu, n_draws = 5000L, burn_in = 1000L) {
+    .Call('zoofactr_logML_SUR_t', PACKAGE = 'zoofactr', X, Y, G0, g0, R0, r0, nu, n_draws, burn_in)
+}
+
+defaultSUR_t <- function(X, Y, coef_scale = 10, cov_scale = 10) {
+    .Call('zoofactr_defaultSUR_t', PACKAGE = 'zoofactr', X, Y, coef_scale, cov_scale)
 }
 
