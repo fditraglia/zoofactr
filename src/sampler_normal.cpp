@@ -36,7 +36,6 @@ SURnormal::SURnormal(const arma::mat& X, const arma::mat& Y,
   r0copy = r0;
   G0copy = G0;
   g0copy = g0;
-  r0copy = r0;
   R0copy = R0;
   Xcopy = X;
   Ycopy = Y;
@@ -72,10 +71,8 @@ double SURnormal::logML(){
   arma::vec gstar = mean(g_draws, 1);
   arma::mat Omega_inv_star = devech(mean(Omega_inv_draws, 1), D);
 
-  double prior1 = as_scalar(density_normal(gstar, g0copy,
-                                           G0copy, true));
-  double prior2 = density_wishart(Omega_inv_star, r0copy,
-                                  R0copy, true);
+  double prior1 = as_scalar(density_normal(gstar, g0copy, G0_inv, true));
+  double prior2 = density_wishart(Omega_inv_star, r0copy, R0copy, true);
 
   arma::mat resid_star =  Ycopy - Xcopy * reshape(gstar, K, D);
   double like = sum(density_normal(resid_star.t(), arma::zeros<arma::vec>(D),

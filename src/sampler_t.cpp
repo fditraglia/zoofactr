@@ -15,6 +15,7 @@ class SURt {
     arma::vec G0_inv_g0, gbar_lambda, g, lambda;
     arma::mat R0_inv, G0_inv;
     arma::mat resid, R_Tlambda, G_Tlambda_inv, Omega_inv, R_Tlambda_draws;
+    arma::mat rr_g_draws, rr_G_Tlambda_inv_draws;
     //Private copies of prior and other input parameters with same names
     //as the corresponding function arguments using an initialization list
     const int r0, nu, n_draws, burn_in;
@@ -74,15 +75,15 @@ SURt::SURt(const arma::mat& X, const arma::mat& Y, const arma::mat& G0,
 //Member function to calculate marginal likelihood
 double SURt::logML(){
   //Posterior means for gamma and Omega inverse
-  arma::vec gstar = mean(g_draws, 1);
+  arma::vec g_star = mean(g_draws, 1);
   arma::mat Omega_inv_star = devech(mean(Omega_inv_draws, 1), D);
 
   //Contribution of prior - identical to model with normal likelihood
-  double prior1 = as_scalar(density_normal(gstar, g0, G0, true));
+  double prior1 = as_scalar(density_normal(g_star, g0, G0_inv, true));
   double prior2 = density_wishart(Omega_inv_star, r0, R0, true);
 
   //Residuals evaluated at posterior mean of gamma: each row is a time period
-  arma::mat resid_star =  Y- X* reshape(gstar, K, D);
+  arma::mat resid_star =  Y- X* reshape(g_star, K, D);
 
   //Contribution of likelihood: transpose residuals since density_t expects
   //                            each column to be one observation (time period)
@@ -91,22 +92,40 @@ double SURt::logML(){
 
   //First Term of Posterior Contribution: Omega inverse
   arma::vec post1_terms(n_draws);
-  arma::mat R_Tlambda_g(D, D);
   for(int i = 0; i < n_draws; i++){
-    R_Tlambda_g = devech(R_Tlambda_draws.col(i), D);
-    post1_terms(i) = density_wishart(Omega_inv_star, r1, R_Tlambda_g);
+      devech(R_Tlambda_draws.col(i), D);
+    post1_terms(i) = density_wishart(Omega_inv_star, r1,
+                devech(R_Tlambda_draws.col(i), D));
   }
   double post1 = log(mean(post1_terms));
 
+  //Reduced run: holds Omega_inv fixed at Omega_inv_star
+  lambda = arma::ones(T);
+  for(int i = 0; i < (n_draws + burn_in); i++){
+    //draw gamma
+    G_Tlambda_inv = G0_inv + kron(Omega_inv_star,
+                                  X.t() * arma::diagmat(lambda) * X);
+    gbar_lambda = solve(G_Tlambda_inv, G0_inv_g0 +
+      vectorise(X.t() * arma::diagmat(lambda) * Y * Omega_inv_star));
+    g = draw_normal(gbar_lambda, G_Tlambda_inv);
+    //construct matrix of errors given gamma: each row is a time period
+    resid = Y - X * reshape(g, K, D);
+    //draw lambda
+    lambda = draw_gamma(a1, 0.5 * (nu + arma::sum(arma::pow(resid, 2), 2)));
+    if(i >= burn_in){
+      j = i - burn_in;
+      rr_G_Tlambda_inv_draws.col(j) = vech(G_Tlambda_inv);
+      rr_g_draws.col(j) = g;
+    }
+  }
   //Second term of Posterior Constribution: gamma
   arma::vec post2_terms;
-  // Implement with same number of draws and burn-in as original samples
-  //      In the reduced run hold Omega inverse fixed at prior mean
-  //      Also, store only the gamma_bar and G_Tlambda since these are used
-  //      in the ML calculation.
+  for(int i = 0; i < n_draws; i++){
+    post2_terms(i) = arma::as_scalar(density_normal(g_star, rr_g_draws.col(i),
+                                     devech(rr_G_Tlambda_inv_draws.col(i), D)));
+  }
   double post2 = log(mean(post2_terms));
-
-
+  //Combine everything
   return (prior1 + prior2) + like - (post1 + post2);
 }
 
