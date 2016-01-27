@@ -60,7 +60,7 @@ SURt::SURt(const arma::mat& X, const arma::mat& Y, const arma::mat& G0,
     R_Tlambda = inv_sympd(R0_inv + resid.t() * arma::diagmat(lambda) * resid);
     Omega_inv = draw_wishart(r1, R_Tlambda);
     //draw lambda
-    lambda = draw_gamma(a1, 0.5 * (nu + arma::sum(arma::pow(resid, 2), 2)));
+    lambda = draw_gamma(a1, 0.5 * (nu + vectorise(arma::sum(arma::pow(resid, 2), 1))));
 
     if(i >= burn_in){
       j = i - burn_in;
@@ -78,7 +78,7 @@ double SURt::logML(){
   arma::mat Omega_inv_star = devech(mean(Omega_inv_draws, 1), D);
 
   //Contribution of prior - identical to model with normal likelihood
-  double prior1 = as_scalar(density_normal(gstar, g0, G0, true));
+  double prior1 = as_scalar(density_normal(gstar, g0, inv_sympd(G0), true));
   double prior2 = density_wishart(Omega_inv_star, r0, R0, true);
 
   //Residuals evaluated at posterior mean of gamma: each row is a time period
