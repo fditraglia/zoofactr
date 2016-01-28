@@ -7,7 +7,7 @@ using namespace Rcpp;
 class SURt {
   public:
     SURt(const arma::mat&, const arma::mat&, const arma::mat&,
-                 const arma::vec&, const arma::mat&, int, int, int, int);
+                 const arma::vec&, const arma::mat&, int, double, int, int);
     double logML();
     arma::mat g_draws, Omega_inv_draws, lambda_draws;
   private:
@@ -18,13 +18,14 @@ class SURt {
     arma::mat rr_g_draws, rr_G_Tlambda_inv_draws;
     //Private copies of prior and other input parameters with same names
     //as the corresponding function arguments using an initialization list
-    const int r0, nu, n_draws, burn_in;
+    const int r0, n_draws, burn_in;
+    double nu;
     const arma::mat X, Y, G0, R0;
     const arma::vec g0;
 };
 //Class constructor
 SURt::SURt(const arma::mat& X, const arma::mat& Y, const arma::mat& G0,
-           const arma::vec& g0,const arma::mat& R0, int r0, int nu,
+           const arma::vec& g0,const arma::mat& R0, int r0, double nu,
            int n_draws = 1000, int burn_in = 1000): r0(r0), nu(nu),
            n_draws(n_draws), burn_in(burn_in), X(X), Y(Y), G0(G0), R0(R0),
            g0(g0){
@@ -82,7 +83,8 @@ double SURt::logML(){
   //Contribution of prior - identical to model with normal likelihood
   double prior1 = as_scalar(density_normal(g_star, g0, G0_inv, true));
   double prior2 = density_wishart(Omega_inv_star, r0, R0, true);
-
+  Rcout << "Prior for gammas " << prior1 << std::endl;
+  Rcout << "Prior for omegas " << prior2 << std::endl;
   //Residuals evaluated at posterior mean of gamma: each row is a time period
   arma::mat resid_star =  Y- X* reshape(g_star, K, D);
 
@@ -90,6 +92,7 @@ double SURt::logML(){
   //                            each column to be one observation (time period)
   double like = sum(density_t(resid_star.t(), nu, arma::zeros<arma::vec>(D),
                                    Omega_inv_star, true));
+  Rcout << "Liki " << like << std::endl;
 
   //First Term of Posterior Contribution: Omega inverse
   arma::vec post1_terms(n_draws);
@@ -131,6 +134,9 @@ double SURt::logML(){
                                      devech(rr_G_Tlambda_inv_draws.col(i), p)));
   }
   double post2 = log(mean(post2_terms));
+  Rcout << "Posterior for gammas " << post2 << std::endl;
+  Rcout << "Posterior for omegas " << post1 << std::endl;
+  Rcout << "Total " << (prior1 + prior2) + like - (post1 + post2) << std::endl;
   //Combine everything
   return (prior1 + prior2) + like - (post1 + post2);
 }
@@ -138,7 +144,7 @@ double SURt::logML(){
 
 // [[Rcpp::export]]
 List samplerTest_t(arma::mat X, arma::mat Y, arma::mat G0, arma::vec g0,
-                 arma::mat R0, int r0, int nu,
+                 arma::mat R0, int r0, double nu,
                  int n_draws, int burn_in){
   SURt draws(X, Y, G0, g0, R0, r0, nu, n_draws, burn_in);
   List out = List::create(Named("g_draws") = draws.g_draws,
@@ -149,7 +155,7 @@ List samplerTest_t(arma::mat X, arma::mat Y, arma::mat G0, arma::vec g0,
 
 // [[Rcpp::export]]
 double logML_SUR_t(arma::mat X, arma::mat Y, arma::mat G0, arma::vec g0,
-                 arma::mat R0, int r0, int nu,
+                 arma::mat R0, int r0, double nu,
                  int n_draws = 5000, int burn_in = 1000){
   SURt draws(X, Y, G0, g0, R0, r0, nu, n_draws, burn_in);
   return draws.logML();

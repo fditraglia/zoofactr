@@ -15,7 +15,7 @@ double density_wishart(arma::mat X, int v, arma::mat S,
 
 arma::vec log1p_arma(arma::vec x);
 
-arma::vec density_t(arma::mat x, int nu, arma::colvec mu, arma::mat Sigma_inv,
+arma::vec density_t(arma::mat x, double nu, arma::colvec mu, arma::mat Sigma_inv,
                          bool logret = false);
 
 arma::vec draw_gamma(double a, arma::vec rate);
