@@ -42,9 +42,7 @@ SURt::SURt(const arma::mat& X, const arma::mat& Y, const arma::mat& G0,
   R_Tlambda_draws.zeros(n_vech, n_draws);
 
   r1 = r0 + T;
-  Rcout << "r1 " << r1 << std::endl;
   a1 = 0.5 * (nu + D); // Gamma shape parameter for lambda draws
-  Rcout << "a1 " << a1 << std::endl;
   R0_inv = inv_sympd(R0);
   G0_inv = inv_sympd(G0);
   G0_inv_g0 = solve(symmatu(G0), g0);
@@ -86,8 +84,6 @@ double SURt::logML(){
   //Contribution of prior - identical to model with normal likelihood
   double prior1 = as_scalar(density_normal(g_star, g0, G0_inv, true));
   double prior2 = density_wishart(Omega_inv_star, r0, R0, true);
-  Rcout << "Prior for gammas " << prior1 << std::endl;
-  Rcout << "Prior for omegas " << prior2 << std::endl;
   //Residuals evaluated at posterior mean of gamma: each row is a time period
   arma::mat resid_star =  Y- X* reshape(g_star, K, D);
 
@@ -95,7 +91,6 @@ double SURt::logML(){
   //                            each column to be one observation (time period)
   double like = sum(density_t(resid_star.t(), nu, arma::zeros<arma::vec>(D),
                                    Omega_inv_star, true));
-  Rcout << "Liki " << like << std::endl;
 
   //First Term of Posterior Contribution: Omega inverse
   arma::vec post1_terms(n_draws);
@@ -105,7 +100,6 @@ double SURt::logML(){
                 devech(R_Tlambda_draws.col(i), D));
   }
   double post1 = log(mean(post1_terms));
-  Rcout << "post1 " << post1 << std::endl;
 
   //Reduced run: holds Omega_inv fixed at Omega_inv_star
   lambda = arma::ones(T);
@@ -138,9 +132,6 @@ double SURt::logML(){
                                      devech(rr_G_Tlambda_inv_draws.col(i), p)));
   }
   double post2 = log(mean(post2_terms));
-  Rcout << "Posterior for gammas " << post2 << std::endl;
-  Rcout << "Posterior for omegas " << post1 << std::endl;
-  Rcout << "Total " << (prior1 + prior2) + like - (post1 + post2) << std::endl;
   //Combine everything
   return (prior1 + prior2) + like - (post1 + post2);
 }
@@ -175,7 +166,7 @@ List defaultSUR_t(arma::mat X, arma::mat Y, double coef_scale = 10,
   arma::vec g0 = arma::zeros(p);
   arma::mat G0 = pow(coef_scale, 2) * arma::eye(p, p);
   int r0 = d + 2;
-  int nu = 5;
+  double nu = 5.0;
   arma::mat R0 = arma::eye(d, d) / (pow(cov_scale, 2) * r0);
   SURt draws(X, Y, G0, g0, R0, r0, nu, 5000, 1000);
   List out = List::create(Named("g_draws") = draws.g_draws,
