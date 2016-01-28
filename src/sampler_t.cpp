@@ -62,7 +62,7 @@ SURt::SURt(const arma::mat& X, const arma::mat& Y, const arma::mat& G0,
     Omega_inv = draw_wishart(r1, R_Tlambda);
     //draw lambda
     lambda = draw_gamma(a1, 0.5 * (nu * arma::ones<arma::vec>(T) +
-      arma::sum(arma::pow(resid, 2), 2)));
+      arma::sum(arma::pow(resid, 2), 1)));
 
     if(i >= burn_in){
       j = i - burn_in;
@@ -102,6 +102,10 @@ double SURt::logML(){
 
   //Reduced run: holds Omega_inv fixed at Omega_inv_star
   lambda = arma::ones(T);
+  rr_g_draws.zeros(p, n_draws);
+  int invG_vech = p * (p + 1) / 2;
+  rr_G_Tlambda_inv_draws.zeros(invG_vech, n_draws);
+
   for(int i = 0; i < (n_draws + burn_in); i++){
     //draw gamma
     G_Tlambda_inv = G0_inv + kron(Omega_inv_star,
@@ -113,7 +117,7 @@ double SURt::logML(){
     resid = Y - X * reshape(g, K, D);
     //draw lambda
     lambda = draw_gamma(a1, 0.5 * (nu * arma::ones<arma::vec>(T) +
-      arma::sum(arma::pow(resid, 2), 2)));
+      arma::sum(arma::pow(resid, 2), 1)));
     if(i >= burn_in){
       j = i - burn_in;
       rr_G_Tlambda_inv_draws.col(j) = vech(G_Tlambda_inv);
@@ -121,10 +125,10 @@ double SURt::logML(){
     }
   }
   //Second term of Posterior Constribution: gamma
-  arma::vec post2_terms;
+  arma::vec post2_terms(n_draws);
   for(int i = 0; i < n_draws; i++){
     post2_terms(i) = arma::as_scalar(density_normal(g_star, rr_g_draws.col(i),
-                                     devech(rr_G_Tlambda_inv_draws.col(i), D)));
+                                     devech(rr_G_Tlambda_inv_draws.col(i), p)));
   }
   double post2 = log(mean(post2_terms));
   //Combine everything
