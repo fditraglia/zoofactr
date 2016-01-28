@@ -82,13 +82,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // density_t
-arma::vec density_t(arma::mat x, int nu, arma::colvec mu, arma::mat Sigma_inv, bool logret);
+arma::vec density_t(arma::mat x, double nu, arma::colvec mu, arma::mat Sigma_inv, bool logret);
 RcppExport SEXP zoofactr_density_t(SEXP xSEXP, SEXP nuSEXP, SEXP muSEXP, SEXP Sigma_invSEXP, SEXP logretSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< arma::mat >::type x(xSEXP);
-    Rcpp::traits::input_parameter< int >::type nu(nuSEXP);
+    Rcpp::traits::input_parameter< double >::type nu(nuSEXP);
     Rcpp::traits::input_parameter< arma::colvec >::type mu(muSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type Sigma_inv(Sigma_invSEXP);
     Rcpp::traits::input_parameter< bool >::type logret(logretSEXP);
@@ -182,7 +182,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // samplerTest_t
-List samplerTest_t(arma::mat X, arma::mat Y, arma::mat G0, arma::vec g0, arma::mat R0, int r0, int nu, int n_draws, int burn_in);
+List samplerTest_t(arma::mat X, arma::mat Y, arma::mat G0, arma::vec g0, arma::mat R0, int r0, double nu, int n_draws, int burn_in);
 RcppExport SEXP zoofactr_samplerTest_t(SEXP XSEXP, SEXP YSEXP, SEXP G0SEXP, SEXP g0SEXP, SEXP R0SEXP, SEXP r0SEXP, SEXP nuSEXP, SEXP n_drawsSEXP, SEXP burn_inSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
@@ -193,7 +193,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type g0(g0SEXP);
     Rcpp::traits::input_parameter< arma::mat >::type R0(R0SEXP);
     Rcpp::traits::input_parameter< int >::type r0(r0SEXP);
-    Rcpp::traits::input_parameter< int >::type nu(nuSEXP);
+    Rcpp::traits::input_parameter< double >::type nu(nuSEXP);
     Rcpp::traits::input_parameter< int >::type n_draws(n_drawsSEXP);
     Rcpp::traits::input_parameter< int >::type burn_in(burn_inSEXP);
     __result = Rcpp::wrap(samplerTest_t(X, Y, G0, g0, R0, r0, nu, n_draws, burn_in));
@@ -201,7 +201,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // logML_SUR_t
-double logML_SUR_t(arma::mat X, arma::mat Y, arma::mat G0, arma::vec g0, arma::mat R0, int r0, int nu, int n_draws, int burn_in);
+double logML_SUR_t(arma::mat X, arma::mat Y, arma::mat G0, arma::vec g0, arma::mat R0, int r0, double nu, int n_draws, int burn_in);
 RcppExport SEXP zoofactr_logML_SUR_t(SEXP XSEXP, SEXP YSEXP, SEXP G0SEXP, SEXP g0SEXP, SEXP R0SEXP, SEXP r0SEXP, SEXP nuSEXP, SEXP n_drawsSEXP, SEXP burn_inSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
@@ -212,7 +212,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type g0(g0SEXP);
     Rcpp::traits::input_parameter< arma::mat >::type R0(R0SEXP);
     Rcpp::traits::input_parameter< int >::type r0(r0SEXP);
-    Rcpp::traits::input_parameter< int >::type nu(nuSEXP);
+    Rcpp::traits::input_parameter< double >::type nu(nuSEXP);
     Rcpp::traits::input_parameter< int >::type n_draws(n_drawsSEXP);
     Rcpp::traits::input_parameter< int >::type burn_in(burn_inSEXP);
     __result = Rcpp::wrap(logML_SUR_t(X, Y, G0, g0, R0, r0, nu, n_draws, burn_in));
