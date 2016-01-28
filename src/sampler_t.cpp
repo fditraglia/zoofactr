@@ -11,7 +11,8 @@ class SURt {
     double logML();
     arma::mat g_draws, Omega_inv_draws, lambda_draws;
   private:
-    int r1, a1, T, D, K, p, n_vech, j;
+    int r1, T, D, K, p, n_vech, j;
+    double a1;
     arma::vec G0_inv_g0, gbar_lambda, g, lambda;
     arma::mat R0_inv, G0_inv;
     arma::mat resid, R_Tlambda, G_Tlambda_inv, Omega_inv, R_Tlambda_draws;
@@ -41,7 +42,9 @@ SURt::SURt(const arma::mat& X, const arma::mat& Y, const arma::mat& G0,
   R_Tlambda_draws.zeros(n_vech, n_draws);
 
   r1 = r0 + T;
+  Rcout << "r1 " << r1 << std::endl;
   a1 = 0.5 * (nu + D); // Gamma shape parameter for lambda draws
+  Rcout << "a1 " << a1 << std::endl;
   R0_inv = inv_sympd(R0);
   G0_inv = inv_sympd(G0);
   G0_inv_g0 = solve(symmatu(G0), g0);
@@ -102,6 +105,7 @@ double SURt::logML(){
                 devech(R_Tlambda_draws.col(i), D));
   }
   double post1 = log(mean(post1_terms));
+  Rcout << "post1 " << post1 << std::endl;
 
   //Reduced run: holds Omega_inv fixed at Omega_inv_star
   lambda = arma::ones(T);
