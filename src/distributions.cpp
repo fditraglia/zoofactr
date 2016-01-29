@@ -176,7 +176,7 @@ arma::vec log1p_arma(arma::vec x){
 //' density_t(cbind(c(0, 0), c(2, 2)), df, m, solve(M))
 //' density_t(cbind(c(0, 0), c(2, 2)), df, m, solve(M), TRUE)
 // [[Rcpp::export]]
-arma::vec density_t(arma::mat x, int nu, arma::colvec mu, arma::mat Sigma_inv,
+arma::vec density_t(arma::mat x, double nu, arma::colvec mu, arma::mat Sigma_inv,
                          bool logret = false){
  int p = Sigma_inv.n_cols;
  arma::mat R = chol(Sigma_inv);
