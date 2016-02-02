@@ -63,8 +63,9 @@ SURt::SURt(const arma::mat& X, const arma::mat& Y, const arma::mat& G0,
     R_Tlambda = inv_sympd(R0_inv + resid.t() * arma::diagmat(lambda) * resid);
     Omega_inv = draw_wishart(r1, R_Tlambda);
     //draw lambda
+   // arma:: mat trial = resid * Omega_inv * resid.t();
     lambda = draw_gamma(a1, 0.5 * (nu * arma::ones<arma::vec>(T) +
-      arma::sum(arma::pow(resid, 2), 1)));
+                                     diagvec(resid * Omega_inv * resid.t())));
 
     if(i >= burn_in){
       j = i - burn_in;
@@ -90,7 +91,7 @@ double SURt::logML(){
   //Contribution of likelihood: transpose residuals since density_t expects
   //                            each column to be one observation (time period)
   double like = sum(density_t(resid_star.t(), nu, arma::zeros<arma::vec>(D),
-                                   Omega_inv_star, true));
+                                   Omega_inv_star , true));
 
   //First Term of Posterior Contribution: Omega inverse
   arma::vec post1_terms(n_draws);
@@ -118,7 +119,7 @@ double SURt::logML(){
     resid = Y - X * reshape(g, K, D);
     //draw lambda
     lambda = draw_gamma(a1, 0.5 * (nu * arma::ones<arma::vec>(T) +
-      arma::sum(arma::pow(resid, 2), 1)));
+                                     diagvec(resid * Omega_inv * resid.t())));
     if(i >= burn_in){
       j = i - burn_in;
       rr_G_Tlambda_inv_draws.col(j) = vech(G_Tlambda_inv);
