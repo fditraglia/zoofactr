@@ -84,9 +84,7 @@ double SURt::logML(){
 
   //Contribution of prior - identical to model with normal likelihood
   double prior1 = as_scalar(density_normal(g_star, g0, G0_inv, true));
-  Rcpp::Rcout << "prior for gammas " << prior1 << std::endl;
   double prior2 = density_wishart(Omega_inv_star, r0, R0, true);
-  Rcpp::Rcout << "prior for omega " << prior2 << std::endl;
   //Residuals evaluated at posterior mean of gamma: each row is a time period
   arma::mat resid_star =  Y- X* reshape(g_star, K, D);
 
@@ -94,7 +92,6 @@ double SURt::logML(){
   //                            each column to be one observation (time period)
   double like = sum(density_t(resid_star.t(), nu, arma::zeros<arma::vec>(D),
                                    Omega_inv_star , true));
-  Rcpp::Rcout << "liki " << like << std::endl;
 
   //First Term of Posterior Contribution: Omega inverse
   arma::vec post1_terms(n_draws);
@@ -135,9 +132,6 @@ double SURt::logML(){
                                      devech(rr_G_Tlambda_inv_draws.col(i), p)));
   }
   double post2 = log(mean(post2_terms));
-  Rcpp::Rcout << "post for gammas " << post2 << std::endl;
-  Rcpp::Rcout << "alt post for gammas " << mean(log((post2_terms))) << std::endl;
-  Rcpp::Rcout << "post for omega " << post1 << std::endl;
   //Combine everything
   return (prior1 + prior2) + like - (post1 + post2);
 }
