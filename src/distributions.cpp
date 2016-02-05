@@ -124,7 +124,7 @@ double density_wishart(arma::mat X, int v, arma::mat S,
   double X_val, X_sign;
   log_det(X_val, X_sign, X);
   double term1 = 0.5 * (v - p - 1) * X_val;
-  double term2 = -0.5 * trace(solve(trimatl(S), trimatl(X)));
+  double term2 = -0.5 * trace(solve(S, X));
   double term3 = -0.5 * v * p * log(2.0);
   double S_val, S_sign;
   log_det(S_val, S_sign, S);

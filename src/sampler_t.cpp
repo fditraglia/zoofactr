@@ -16,7 +16,7 @@ class SURt {
     arma::vec G0_inv_g0, gbar_lambda, g, lambda;
     arma::mat R0_inv, G0_inv;
     arma::mat resid, R_Tlambda, G_Tlambda_inv, Omega_inv, R_Tlambda_draws;
-    arma::mat rr_g_draws, rr_G_Tlambda_inv_draws;
+    arma::mat rr_g_bar_lambda_draws, rr_G_Tlambda_inv_draws;
     //Private copies of prior and other input parameters with same names
     //as the corresponding function arguments using an initialization list
     const int r0, n_draws, burn_in;
@@ -92,7 +92,6 @@ double SURt::logML(){
   //                            each column to be one observation (time period)
   double like = sum(density_t(resid_star.t(), nu, arma::zeros<arma::vec>(D),
                                    Omega_inv_star , true));
-
   //First Term of Posterior Contribution: Omega inverse
   arma::vec post1_terms(n_draws);
   for(int i = 0; i < n_draws; i++){
@@ -103,7 +102,7 @@ double SURt::logML(){
 
   //Reduced run: holds Omega_inv fixed at Omega_inv_star
   lambda = arma::ones(T);
-  rr_g_draws.zeros(p, n_draws);
+  rr_g_bar_lambda_draws.zeros(p, n_draws);
   int invG_vech = p * (p + 1) / 2;
   rr_G_Tlambda_inv_draws.zeros(invG_vech, n_draws);
 
@@ -122,13 +121,13 @@ double SURt::logML(){
     if(i >= burn_in){
       j = i - burn_in;
       rr_G_Tlambda_inv_draws.col(j) = vech(G_Tlambda_inv);
-      rr_g_draws.col(j) = g;
+      rr_g_bar_lambda_draws.col(j) = gbar_lambda;
     }
   }
   //Second term of Posterior Constribution: gamma
   arma::vec post2_terms(n_draws);
   for(int i = 0; i < n_draws; i++){
-    post2_terms(i) = arma::as_scalar(density_normal(g_star, rr_g_draws.col(i),
+    post2_terms(i) = arma::as_scalar(density_normal(g_star, rr_g_bar_lambda_draws.col(i),
                                      devech(rr_G_Tlambda_inv_draws.col(i), p)));
   }
   double post2 = log(mean(post2_terms));
