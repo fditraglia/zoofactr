@@ -124,7 +124,7 @@ double density_wishart(arma::mat X, int v, arma::mat S,
   double X_val, X_sign;
   log_det(X_val, X_sign, X);
   double term1 = 0.5 * (v - p - 1) * X_val;
-  double term2 = -0.5 * trace(solve(trimatl(S), trimatl(X)));
+  double term2 = -0.5 * trace(solve(S, X));
   double term3 = -0.5 * v * p * log(2.0);
   double S_val, S_sign;
   log_det(S_val, S_sign, S);
@@ -176,7 +176,7 @@ arma::vec log1p_arma(arma::vec x){
 //' density_t(cbind(c(0, 0), c(2, 2)), df, m, solve(M))
 //' density_t(cbind(c(0, 0), c(2, 2)), df, m, solve(M), TRUE)
 // [[Rcpp::export]]
-arma::vec density_t(arma::mat x, int nu, arma::colvec mu, arma::mat Sigma_inv,
+arma::vec density_t(arma::mat x, double nu, arma::colvec mu, arma::mat Sigma_inv,
                          bool logret = false){
  int p = Sigma_inv.n_cols;
  arma::mat R = chol(Sigma_inv);
